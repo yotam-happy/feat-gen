@@ -1,0 +1,75 @@
+<FeatGen>
+	<Experiment>
+		<RepeatedExperiment>false</RepeatedExperiment>
+		<BestOf>5</BestOf>
+		<EvaluationSetSize>0.4</EvaluationSetSize>
+		<Classifier>edu.featget.adapters.libsvm.LibSVMClassifier</Classifier>
+		<UseSavedModel>false</UseSavedModel>
+		<SaveModel>true</SaveModel>
+		<ModelFile>model_with_cats.out</ModelFile>
+	</Experiment>
+<!--	<DocumentSource class="edu.featgen.standard.source.Reuters21578DocumentSource" name="source">
+		<Directory>data\reuters21578</Directory>
+	</DocumentSource>-->
+	<DocumentSource class="edu.featgen.standard.source.OhsumedDocumentSource" name="source">
+		<Filename>data\ohsu-trec\trec9-test\ohsumed.88-91</Filename>
+		<Only20000Docs>true</Only20000Docs>
+		<OnlyShort>true</OnlyShort>
+	</DocumentSource>
+	<Generators>
+		<FeatureGenerator class="edu.featgen.standard.generator.BOWFeatureGenerator" name="bow">
+			<SourceFeatureGenerator>source</SourceFeatureGenerator>
+			<SourceFeatureName>source_title</SourceFeatureName>
+			<MaxNGram>1</MaxNGram>
+			<CountTreshhold>3</CountTreshhold>
+			<UsedForClassification>true</UsedForClassification>
+			<StopWordsFileName>C:\EclipseWorkspace\feat-gen\config\stopwords.txt</StopWordsFileName>
+		</FeatureGenerator>
+		<FeatureGenerator class="edu.featgen.standard.generator.TfidfFeatureModifier" name="bow_tfidf">
+			<SourceFeatureGenerator>bow</SourceFeatureGenerator>
+			<SourceFeatureSet>bow</SourceFeatureSet>
+			<Scheme>ltc</Scheme>
+		</FeatureGenerator>
+		<FeatureGenerator class="edu.featgen.standard.generator.ESAFeatureGenerator" name="esa">
+			<SourceFeatureGenerator>source</SourceFeatureGenerator>
+			<SourceFeatureName>source_title</SourceFeatureName>
+			<UsedForClassification>true</UsedForClassification>
+			<Categories>true</Categories>
+		 </FeatureGenerator>
+<!--		<FeatureGenerator class="edu.featgen.standard.generator.clustering.ClusterByW2V" name="clusters">
+			<SourceFeatureGenerator>esa</SourceFeatureGenerator>
+			<SourceFeatureSet>esa</SourceFeatureSet>
+			<UsedForClassification>true</UsedForClassification>
+			<K>128</K>
+			<EmbeddingFileName>C:\repo\DeepProject\data\word2vec\dim300context_vecs</EmbeddingFileName>
+		 </FeatureGenerator> -->
+<!--		<FeatureGenerator class="edu.featgen.standard.generator.W2VFeatureGenerator" name="w2v">
+			<SourceFeatureGenerator>source</SourceFeatureGenerator>
+			<SourceFeatureName>source_title</SourceFeatureName>
+			<EmbeddingFile>C:\Python\yoavgo-word2vecf-90e299816bcd\scripts\dim640vecs3iter</EmbeddingFile>
+			<UsedForClassification>true</UsedForClassification>
+		 </FeatureGenerator>-->
+<!--		<FeatureGenerator class="edu.featgen.standard.generator.ESANewClusterFeatureGenerator" name="clusters">
+			<SourceFeatureGenerator>esa</SourceFeatureGenerator>
+			<SourceFeatureSet>esa</SourceFeatureSet>
+			<NumberOfClusters>300</NumberOfClusters>
+			<NumberOfBestToUse>10000</NumberOfBestToUse>
+			<Combiner>sum</Combiner>
+			<UsedForClassification>true</UsedForClassification>
+		</FeatureGenerator>-->
+	</Generators>
+	<FeatureSelectors>
+<!--		<FeatureSelector class="edu.featgen.standard.selector.InfoGainFeatureSelector" name="bow_feature_selector">
+			<SourceFeatureSet>bow</SourceFeatureSet>
+			<KeepNFeatures>300</KeepNFeatures>
+		</FeatureSelector>-->
+		<FeatureSelector class="edu.featgen.standard.selector.InfoGainFeatureSelector" name="esa_feature_selector">
+			<SourceFeatureSet>esa</SourceFeatureSet>
+			<KeepNFeatures>4000</KeepNFeatures>
+		</FeatureSelector>
+		<FeatureSelector class="edu.featgen.standard.selector.InfoGainFeatureSelector" name="cluster_feature_selector">
+			<SourceFeatureSet>esacats</SourceFeatureSet>
+			<KeepNFeatures>4000</KeepNFeatures>
+		</FeatureSelector>
+	</FeatureSelectors>
+</FeatGen>

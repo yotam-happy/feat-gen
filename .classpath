@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/esa-lucene"/>
+	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.35-bin.jar"/>
+	<classpathentry kind="lib" path="lib/weka.jar" sourcepath="lib/weka-src.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/joox-1.2.0.jar"/>
+	<classpathentry kind="lib" path="lib/LibSVM_wrapper.jar"/>
+	<classpathentry kind="lib" path="lib/libsvm.jar"/>
+	<classpathentry kind="lib" path="/esa-lucene/web/WEB-INF/lib/lucene-analyzers-3.0.0.jar"/>
+	<classpathentry kind="lib" path="/esa-lucene/web/WEB-INF/lib/lucene-core-3.0.0.jar"/>
+	<classpathentry kind="lib" path="lib/snowball-20051019.jar"/>
+	<classpathentry kind="lib" path="/esa-lucene/web/WEB-INF/lib/trove-2.1.0.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JotClustering"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JGibbLDA-v.1.0"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
