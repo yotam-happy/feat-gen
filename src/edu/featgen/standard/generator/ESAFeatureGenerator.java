@@ -59,7 +59,7 @@ public class ESAFeatureGenerator implements FeatureGenerator{
 	}
 
 	@Override
-	public void processDocument(Document doc, DocumentSet allDocs) {
+	public void processDocument(Document doc) {
 		doc.addFeatureSet(FEATURE_SET, usedForClassification);
 		String text = doc.getFeature(sourceFeatureName).stringValue();
 		
@@ -78,15 +78,9 @@ public class ESAFeatureGenerator implements FeatureGenerator{
 	
 	protected void processCategories(Document doc, IConceptVector concepts){
 		doc.addFeatureSet(CATEGORY_FEATURE_SET, usedForClassification);
-		IConceptVector categories = esa.getCategoriesVector(concepts);
+		IConceptVector categories = esa.getCategoriesVector(concepts, maxConeceptsPerDoc);
 		categories.forEach((id,s)->
 			doc.getFeatureSet(CATEGORY_FEATURE_SET).add(Integer.toString(id), (Object)s));
-	}
-
-	@Override
-	public void postProcess(DocumentSet docs) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	public static FeatureGenerator instantiateFromXML(Match conf) {

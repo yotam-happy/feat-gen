@@ -1,5 +1,7 @@
 package edu.featgen.def;
 
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,6 +35,11 @@ public interface DocumentSet {
 		stream().forEach((doc)->doc.removeFeature(name));
 	}
 
-	public void process(Map<String,Object> transientData);
-	public void process(String forClass, Map<String,Object> transientData);
+	public void readDataSet();
+	public void processForTrain(String forClass, Map<String,Object> transientData);
+	public void processForTest(String forClass);
+
+	public void serialize(ObjectOutputStream oos);
+	public void deserialize(ObjectInputStream ois);
 }
+

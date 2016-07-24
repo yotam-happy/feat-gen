@@ -15,8 +15,7 @@ public interface FeatureGenerator extends Serializable {
 	Set<String> getRequiredInputs();
 
 	Object preProcess(DocumentSet docs, Object transientData);
-	void processDocument(Document doc, DocumentSet allDocs);
-	void postProcess(DocumentSet docs);
+	void processDocument(Document doc);
 	
 	// reset is called for generators that are run for each class
 	// with the class name. Should reset the generator state and

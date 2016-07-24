@@ -44,7 +44,7 @@ public class ESAWrapper {
 	public IConceptVector get2ndOrderConceptVector(String doc, int limit){
 		return searcher.getCombinedVector(doc, limit);
 	}
-	public IConceptVector getCategoriesVector(IConceptVector v){
-		return categoriesSearcher.getCategoriesVector(v);
+	public IConceptVector getCategoriesVector(IConceptVector v, int limit){
+		return ESASearcher.getNormalVector(categoriesSearcher.getCategoriesVector(v),limit);
 	}
 }

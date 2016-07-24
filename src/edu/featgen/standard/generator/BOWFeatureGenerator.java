@@ -41,6 +41,8 @@ public class BOWFeatureGenerator implements FeatureGenerator{
 	
 	Stemmer stemmer;
 	
+	Map<String, Double> ngram_counts;
+
 	Set<String> stopWords = new HashSet<>();
 	WikipediaAnalyzer analyzer;
 	public BOWFeatureGenerator(String name,
@@ -98,11 +100,6 @@ public class BOWFeatureGenerator implements FeatureGenerator{
 		return new HashSet<>(Arrays.asList(sourceFeatureGenerator));
 	}
 
-	@Override
-	public Object preProcess(DocumentSet docs, Object transientData) {
-		return null;
-	}
-
 	private boolean tokenValidation(String token) {
 		if(stopWords.contains(token)){
 			return false;
@@ -158,33 +155,32 @@ public class BOWFeatureGenerator implements FeatureGenerator{
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public void processDocument(Document doc, DocumentSet allDocs) {
-		forEachNGram(doc,(ngram, i)->{
-			Double v = doc.getFeatureSet(FEATURE_SET(i)).getDouble(ngram);
-			doc.getFeatureSet(FEATURE_SET(i)).add(ngram, new Double(1.0 + (v != null ? v : 0.0)));
-		});
+	public Object preProcess(DocumentSet docs, Object transientData) {
+		if (transientData != null){
+			ngram_counts = (Map<String, Double>)transientData;
+		} else {
+			ngram_counts = new HashMap<String, Double>();
+			docs.forEach((docId,doc)->{
+				forEachNGram(doc,(ngram, i)->{
+					ngram_counts.put(ngram, 
+							1.0 + 
+							(ngram_counts.get(ngram) == null ? 0 : ngram_counts.get(ngram)));
+				});
+			});
+		}
+		return ngram_counts;
 	}
 
 	@Override
-	public void postProcess(DocumentSet docs) {
-		for (int i = 1; i <= maxNGram; i++){
-			String fs = FEATURE_SET(i);
-
-			Map<String, Double> counts = new HashMap<String, Double>();
-			docs.forEach((docId, doc)->doc.getFeatureSet(fs).forEach((f)->{
-				counts.put(f.name, 
-						1.0 + 
-						(counts.get(f.name) == null ? 0 : counts.get(f.name)));
-			}));
-			
-			docs.forEach((docId, doc)->{
-				Set<String> forRemoval = doc.getFeatureSet(fs).stream()
-						.filter((f)->counts.get(f.name) < countTreshhold)
-						.map((f)->f.name).collect(Collectors.toSet());
-				forRemoval.forEach((n)->doc.removeFeature(n));
-			});
-		}
+	public void processDocument(Document doc) {
+		forEachNGram(doc,(ngram, i)->{
+			if (ngram_counts.get(ngram) != null && ngram_counts.get(ngram) >= countTreshhold){
+				Double v = doc.getFeatureSet(FEATURE_SET(i)).getDouble(ngram);
+				doc.getFeatureSet(FEATURE_SET(i)).add(ngram, new Double(1.0 + (v != null ? v : 0.0)));
+			}
+		});
 	}
 
 	public Set<String> featureSets() {

@@ -64,7 +64,7 @@ public class TfidfFeatureModifier implements FeatureGenerator{
 	}
 
 	@Override
-	public void processDocument(Document doc, DocumentSet allDocs) {
+	public void processDocument(Document doc) {
 		double norm;
 		if (scheme.charAt(2) == 'c'){
 			norm = Math.sqrt(sourceFeatureSets.stream().map((fs)->doc.getFeatureSet(fs))
@@ -118,10 +118,6 @@ public class TfidfFeatureModifier implements FeatureGenerator{
 		});
 	}
 
-	@Override
-	public void postProcess(DocumentSet docs) {
-	}
-	
 	public static FeatureGenerator instantiateFromXML(Match conf) {
 		Set<String> sourceFeatureGenerators = conf.xpath("./SourceFeatureGenerator").contents()
 				.stream().map((s)->s.trim()).collect(Collectors.toSet());

@@ -100,7 +100,7 @@ public class Documents implements DocumentSet, Serializable{
 		return documentSource;
 	}
 	
-	public void process(Map<String,Object> transientData) {
+	public void readDataSet() {
 		documents.clear();		
 		documentSource.reset();
 		long id = 0;
@@ -115,35 +115,59 @@ public class Documents implements DocumentSet, Serializable{
 			id++;
 		}
 		Logger.writeToConsole("Finished reading " + (id+1) + " documents");
-
-		process(null, transientData);
 	}
-	public void process(String forClass, Map<String,Object> transientData) {
+	
+	@Override
+	public void processForTrain(String forClass, Map<String,Object> transientData) {
 		List<FeatureGenerator> generatorOrder = resolveGenerationOrder();
 
-		Logger.writeToConsole("Doing feature generation" + 
-		(forClass != null ? " for class " + forClass : ""));
+		Logger.writeToConsole("Doing training feature generation" + 
+				(forClass != null ? " for class " + forClass : ""));
+		generatorOrder.forEach((generator) -> {
+			
+			if((forClass == null && generator.isRecalculateForEachClass()) ||
+					(forClass != null && !generator.isRecalculateForEachClass())){
+				return;
+			}			
+			Logger.writeToConsole("Running generator: " + generator.getName());
+
+			generator.reset(this, forClass);
+			Object d = generator.preProcess(this, transientData.get(generator.getName()));
+			transientData.put(generator.getName(), d);
+
+			ProgressReporter<Void> rep = new ProgressReporter<>(Duration.ofSeconds(5), 
+					(n,t) -> Logger.writeToConsole("Done " + n + " documents in " + t.get(ChronoUnit.SECONDS)));
+
+			this.forEach((docId, doc) -> {
+				generator.processDocument(doc); 
+				rep.countOne();
+			});
+			rep.finish();
+		});
+	}
+	
+	@Override
+	public void processForTest(String forClass) {
+		List<FeatureGenerator> generatorOrder = resolveGenerationOrder();
+
+		Logger.writeToConsole("Doing testing feature generation" + 
+				(forClass != null ? " for class " + forClass : ""));
 		generatorOrder.forEach((generator) -> {
 			
 			if((forClass == null && generator.isRecalculateForEachClass()) ||
 					(forClass != null && !generator.isRecalculateForEachClass())){
 				return;
 			}
-			generator.reset(this, forClass);
-			
 			Logger.writeToConsole("Running generator: " + generator.getName());
-			Object d = generator.preProcess(this, transientData.get(generator.getName()));
-			transientData.put(generator.getName(), d);
 			
 			ProgressReporter<Void> rep = new ProgressReporter<>(Duration.ofSeconds(5), 
 					(n,t) -> Logger.writeToConsole("Done " + n + " documents in " + t.get(ChronoUnit.SECONDS)));
 
 			this.forEach((docId, doc) -> {
-				generator.processDocument(doc, this); 
+				generator.processDocument(doc); 
 				rep.countOne();
 			});
 			rep.finish();
-			generator.postProcess(this);
 		});
 	}
 	
@@ -317,13 +341,13 @@ public class Documents implements DocumentSet, Serializable{
 	public String getFeatureDescription(String fname){
 		Tuple<String,String> t = breakDownFeatureName(fname);
 		FeatureGenerator fg = getGeneratorByName(t.x);
-		return fg.getFeatureDescription(t.y);
+		return fg == null ? null : fg.getFeatureDescription(t.y);
 	}
 	@Override
 	public String getFeatureDescriptiveName(String fname){
 		Tuple<String,String> t = breakDownFeatureName(fname);
 		FeatureGenerator fg = getGeneratorByName(t.x);
-		String s = fg.getFeatureDescriptiveName(t.y);
+		String s = fg == null ? null : fg.getFeatureDescriptiveName(t.y);
 		return s == null ? fname : s;
 	}
 	

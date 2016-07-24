@@ -195,7 +195,7 @@ public class ESANewClusterFeatureGenerator implements FeatureGenerator{
 	}
 
 	@Override
-	public void processDocument(Document doc, DocumentSet allDocs) {
+	public void processDocument(Document doc) {
 		doc.addFeatureSet(FEATURE_SET, usedForClassification);
 		clusters.forEach((i,c)->{
 			DoubleStream stream = c.stream()
@@ -212,12 +212,6 @@ public class ESANewClusterFeatureGenerator implements FeatureGenerator{
 				doc.getFeatureSet(FEATURE_SET).add(i.toString(), v);
 			}
 		});
-	}
-	
-	@Override
-	public void postProcess(DocumentSet docs) {
-		// TODO Auto-generated method stub
-		
 	}
 	
 	public static FeatureGenerator instantiateFromXML(Match conf) {

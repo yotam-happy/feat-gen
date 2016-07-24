@@ -32,7 +32,7 @@ public class createJGibbLDAData {
 
 	public static void saveToFileESA(String BOWGeneratorName, OutputStream fout){
 		PrintWriter pw = new PrintWriter(fout);
-		Documents docs = 
+		Documents docs = (Documents) 
 				XMLConfigurationLoader.buildFromFile(new File("featgen-config.xml"))
 				.getDocuments();
 		BOWFeatureGenerator gen = (BOWFeatureGenerator)docs.getGeneratorByName(BOWGeneratorName);
@@ -79,7 +79,7 @@ public class createJGibbLDAData {
 	
 	public static void saveToFile(String BOWGeneratorName, OutputStream fout){
 		PrintWriter pw = new PrintWriter(fout);
-		Documents docs = 
+		Documents docs = (Documents)
 				XMLConfigurationLoader.buildFromFile(new File("featgen-config.xml"))
 				.getDocuments();
 		BOWFeatureGenerator gen = (BOWFeatureGenerator)docs.getGeneratorByName(BOWGeneratorName);

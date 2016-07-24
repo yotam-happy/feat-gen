@@ -56,7 +56,7 @@ public class RangeNormalizeFeatureModifier implements FeatureGenerator{
 	}
 
 	@Override
-	public void processDocument(Document doc, DocumentSet allDocs) {
+	public void processDocument(Document doc) {
 		sourceFeatureSets.forEach((fs) -> {
 			doc.getFeatureSet(fs).replaceAll((name,value)->{
 				Double b = min.get(name);
@@ -69,10 +69,6 @@ public class RangeNormalizeFeatureModifier implements FeatureGenerator{
 				return ((Double)value - b) / (t-b);
 			});
 		});
-	}
-
-	@Override
-	public void postProcess(DocumentSet docs) {
 	}
 
 	public static FeatureGenerator instantiateFromXML(Match conf) {

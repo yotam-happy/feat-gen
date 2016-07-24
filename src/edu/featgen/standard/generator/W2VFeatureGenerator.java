@@ -91,7 +91,7 @@ public class W2VFeatureGenerator implements FeatureGenerator{
 	}
 	
 	@Override
-	public void processDocument(Document doc, DocumentSet allDocs) {
+	public void processDocument(Document doc) {
 		doc.addFeatureSet(FEATURE_SET, usedForClassification);
 
 		String text = doc.getFeature(sourceFeatureName).stringValue();
@@ -123,10 +123,6 @@ public class W2VFeatureGenerator implements FeatureGenerator{
 		}
 	}
 	
-	@Override
-	public void postProcess(DocumentSet docs) {
-	}
-
 	@Override
 	public void reset(DocumentSet docs, String className) {
 		// TODO Auto-generated method stub
