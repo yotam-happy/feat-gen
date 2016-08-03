@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.joox.Match;
@@ -134,12 +135,12 @@ public class InfoGainFeatureSelector implements FeatureSelector {
 		}
 	}
 
-	public static List<Tuple<Double,String>> getFeaturesInfoGain(
+	public static List<Tuple<Double,String>> getFeaturesRelevance(
 			DocumentSet docs, 
 			String targetClass,
 			Set<String> sourceFeatureSets,
-			int keepNFeatures,
-			Set<String> chooseFrom){
+			Set<String> chooseFrom,
+			Supplier<FeatureRelevanceMeasure> FRMInitializer){
 		double[] expectedWeightPerLabel = new double[2];
 		// class counts
 		docs.forEach((docId, doc)->{
@@ -155,7 +156,7 @@ public class InfoGainFeatureSelector implements FeatureSelector {
 				.forEach((f)->{
 					if(chooseFrom == null || chooseFrom.contains(f.getName())){
 						if(!featureRelevance.containsKey(f.getName())){
-							FeatureRelevanceMeasure c = new InfoGainCalc(2, null);
+							FeatureRelevanceMeasure c = FRMInitializer.get();
 							c.setExpectedWeightPerLabelHint(expectedWeightPerLabel);
 							featureRelevance.put(f.getName(), c);
 						}
@@ -192,9 +193,9 @@ public class InfoGainFeatureSelector implements FeatureSelector {
 			int keepNFeatures,
 			Set<String> chooseFrom){
 		
-		List<Tuple<Double,String>> l = getFeaturesInfoGain(
-				docs, targetClass, sourceFeatureSets, 
-				keepNFeatures, chooseFrom);
+		List<Tuple<Double,String>> l = getFeaturesRelevance(
+				docs, targetClass, sourceFeatureSets, chooseFrom,
+				()-> new InfoGainCalc(2, null));
 		
 		// get filtered
 		Set<String> res = new HashSet<>();

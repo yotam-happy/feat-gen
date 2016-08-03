@@ -108,7 +108,7 @@ public class ESANewClusterFeatureGenerator implements FeatureGenerator{
 		});
 
 		Function<FeatureNode,Double> estimateInfoGain = (f)->{
-			InfoGainCalc calc = new InfoGainCalc(2, false, f.featureName);
+			InfoGainCalc calc = new InfoGainCalc(2, false, f.featureName, InfoGainCalc.EstimationEnum.INFO_GAIN);
 			f.values.forEachEntry((id,v)->{
 				calc.addSample(training.document(id).getClasses().contains(className) ? 1 : 0, 
 						v / InfoGainCalc.PRECISION_INV);

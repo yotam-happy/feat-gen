@@ -16,7 +16,6 @@ import java.util.Set;
 
 import org.joox.Match;
 
-import edu.clustering.jot.datapoint.DenseEucledianPoint;
 import edu.clustering.jot.datapoint.DenseEucledianPoint.Metric;
 import edu.clustering.jot.interfaces.Point;
 import edu.featgen.def.DocumentSet;
@@ -24,14 +23,13 @@ import edu.featgen.def.FeatureGenerator;
 import edu.featgen.standard.generator.AbstractClusterFeatureGennerator;
 import edu.featgen.standard.generator.ESAFeatureGenerator;
 import edu.featgen.standard.util.Word2VecReader;
-import edu.wiki.search.ESASearcher;
 import edu.wiki.util.db.InlinkQueryOptimizer;
+
 
 
 public class ClusterByW2V  extends AbstractClusterFeatureGennerator{
 	private static final long serialVersionUID = -4356098194155055427L;
 	public static final String TEMP_FILE = "concet_w2v_vectors.dump";
-	public static final String FEATURE_SET = "esa";
 	private int minInlinksToParticipate = 100;
 
 	private String sourceFeatureGenerator;
@@ -40,8 +38,6 @@ public class ClusterByW2V  extends AbstractClusterFeatureGennerator{
 	private boolean usedForClassification;
 	private List<Integer> kList;
 	private String embeddingFilename;
-
-	ESASearcher searcher = new ESASearcher();
 
 	public ClusterByW2V(String name,
 			String sourceFeatureGenerator,
@@ -87,7 +83,7 @@ public class ClusterByW2V  extends AbstractClusterFeatureGennerator{
 		Map<Integer,Integer> conceptDF = new HashMap<>();
 		
 		docs.forEach((docId, doc)->{
-			doc.getFeatureSet(FEATURE_SET).forEach((feature)->{
+			doc.getFeatureSet(sourceFeatureSet).forEach((feature)->{
 				int id = ESAFeatureGenerator.featureNameToId(feature.name);
 				Integer c = conceptDF.get(id);
 				conceptDF.put(id, c != null ? c + 1 : 1);
@@ -106,7 +102,7 @@ public class ClusterByW2V  extends AbstractClusterFeatureGennerator{
 	
 	@SuppressWarnings("unchecked")
 	protected Map<String, Point> getW2VVectors(Set<Integer> conceptFilter){
-		// This is essencially a one off task so we can save results somewhere
+		// This is essentially a one off task so we can save results somewhere
 		if (new File(TEMP_FILE).exists()){
 			try{
 				FileInputStream fin = new FileInputStream(TEMP_FILE);
@@ -115,12 +111,14 @@ public class ClusterByW2V  extends AbstractClusterFeatureGennerator{
 				return (Map<String, Point>) ois.readObject();
 			}catch(IOException | ClassNotFoundException e){
 				// Just do it again
+				System.out.println(e.getMessage());
+				e.printStackTrace();
 			}
 		}
 
 		Map<String, Point> map = new HashMap<>();
 		new Word2VecReader(this.embeddingFilename).forEach((name,vec)->{
-			map.put(name,  new DenseEucledianPoint(vec, Metric.CosineDistnce));
+			map.put(name,  new NamedPoint(vec, Metric.CosineDistnce, name));
 		}, (s)->{
 			try{
 				int id = Integer.parseInt(s);
@@ -138,7 +136,8 @@ public class ClusterByW2V  extends AbstractClusterFeatureGennerator{
 			oos.writeObject(map);
 		}catch(IOException e){
 			// Just do it again next time	
-			System.out.println(e);
+			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 		
 		return map;
@@ -173,7 +172,7 @@ public class ClusterByW2V  extends AbstractClusterFeatureGennerator{
 
 	@Override
 	protected boolean getClusterOnlyOnce() {
-		return true;
+		return false;
 	}
 
 

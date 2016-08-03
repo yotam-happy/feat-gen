@@ -115,9 +115,10 @@ public class Experiment {
 			DocumentSet train = docs.getTrainingSet();
 			DocumentSet test = docs.getTestingSet();
 
-			train(topic, train, null, null, new HashMap<>());
-			Evaluations evaluations = evaluate(test, topic, new HashMap<>());
-			Evaluations evaluationsTrain = evaluate(train, topic, new HashMap<>());
+			Map<String, Object> transientData = new HashMap<>();
+			train(topic, train, null, null, transientData);
+			Evaluations evaluations = evaluate(test, topic, transientData);
+			Evaluations evaluationsTrain = evaluate(train, topic, transientData);
 			return new Tuple<Evaluations,Evaluations>(evaluations,evaluationsTrain);
 		}
 	}

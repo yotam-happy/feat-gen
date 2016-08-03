@@ -24,6 +24,7 @@ public class InfoGainCalc implements WeakClassifierForAdaBoostFS, FeatureRelevan
 	// number of possible labels
 	int nLabels;
 	boolean recursive;
+	EstimationEnum est;
 	
 	// Holds the selected cut points
 	Set<Long> cutpoints = new HashSet<>();
@@ -37,14 +38,15 @@ public class InfoGainCalc implements WeakClassifierForAdaBoostFS, FeatureRelevan
 	String featureName;
 	
 	public InfoGainCalc(int nLabels, String featureName){
-		this(nLabels, true, featureName);
+		this(nLabels, true, featureName, EstimationEnum.INFO_GAIN);
 	}
 	
-	public InfoGainCalc(int nLabels, boolean recursive, String featureName){
+	public InfoGainCalc(int nLabels, boolean recursive, String featureName, EstimationEnum est){
 		this.nLabels = nLabels;
 		seenWeightPerLabel = new double[nLabels+1];
 		this.recursive = recursive;
 		this.featureName = featureName;
+		this.est = est;
 	}
 
 	public void setExpectedWeightPerLabelHint(double[] expectedWeightPerLabelHint){
@@ -91,13 +93,19 @@ public class InfoGainCalc implements WeakClassifierForAdaBoostFS, FeatureRelevan
 
 		discretisize(allSamplesVec, seenWeightPerLabel);
 		
-		double entropyPre = entropy(seenWeightPerLabel, null, true, -1);
-		double entropyAfter = entropyDiscretisized(allSamplesVec, cutpoints, -1);
-		if (Double.compare(entropyPre, entropyAfter - 0.0000001) < 0){
-			// sanity check
-			throw new RuntimeException("bug!");
+		if (est == EstimationEnum.POS){
+			return getPurityWhereExist();
+		} else if (est == EstimationEnum.NEG){
+			return 1 - getPurityWhereExist();
+		} else {
+			double entropyPre = entropy(seenWeightPerLabel, null, true, -1);
+			double entropyAfter = entropyDiscretisized(allSamplesVec, cutpoints, -1);
+			if (Double.compare(entropyPre, entropyAfter - 0.0000001) < 0){
+				// sanity check
+				throw new RuntimeException("bug!");
+			}
+			return entropyPre - entropyAfter;
 		}
-		return entropyPre - entropyAfter;
 	}	
 
 	/**
@@ -431,5 +439,9 @@ public class InfoGainCalc implements WeakClassifierForAdaBoostFS, FeatureRelevan
 		
 		return i >= 0 ? intervalClassification[i] :
 			intervalClassification[-i - 1];
+	}
+	
+	public enum EstimationEnum{
+		INFO_GAIN, POS, NEG;
 	}
 }

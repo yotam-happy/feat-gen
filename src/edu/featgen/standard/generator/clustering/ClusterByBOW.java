@@ -31,7 +31,6 @@ import edu.wiki.util.db.InlinkQueryOptimizer;
 public class ClusterByBOW extends AbstractClusterFeatureGennerator{
 	private static final long serialVersionUID = 2663627273657989441L;
 
-	public static final String FEATURE_SET = "esa";
 	public static final String TEMP_FILE = "concet_bow_vectors.dump";
 	private int minInlinksToParticipate = 100;
 
@@ -81,7 +80,7 @@ public class ClusterByBOW extends AbstractClusterFeatureGennerator{
 		Map<Integer,Integer> conceptDF = new HashMap<>();
 		
 		docs.forEach((docId, doc)->{
-			doc.getFeatureSet(FEATURE_SET).forEach((feature)->{
+			doc.getFeatureSet(sourceFeatureSet).forEach((feature)->{
 				int id = ESAFeatureGenerator.featureNameToId(feature.name);
 				Integer c = conceptDF.get(id);
 				conceptDF.put(id, c != null ? c + 1 : 1);

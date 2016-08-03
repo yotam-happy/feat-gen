@@ -43,7 +43,7 @@ public class Main {
 				new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(Calendar.getInstance().getTime()));
 		Logger.writeToResults("---------------------------------");
 		Logger.writeToReport("------------ new report ---------");
-		WikiDBConnector.initialize("localhost", "enwiki-20150403", "root", "rockon123");
+		WikiDBConnector.initialize("localhost", "wikiprep-esa-en20151002", "root", "rockon123");
 		
 		Experiment experiment = XMLConfigurationLoader.buildFromFile(new File("featgen-config.xml"));
 		experiment.processDocuments();
